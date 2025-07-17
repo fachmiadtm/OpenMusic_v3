@@ -11,7 +11,7 @@
  */
 export const up = (pgm) => {
   pgm.createTable('albums', {
-    id: {
+    album_id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
@@ -26,7 +26,7 @@ export const up = (pgm) => {
   });
 
   pgm.createTable('songs', {
-    id: {
+    song_id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
