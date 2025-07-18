@@ -20,10 +20,12 @@ const mapDBAlbumToModel = ({
   album_id,
   name,
   year,
+  songs = [],
 }) => ({
   id : album_id,
   name,
   year,
+  songs,
 });
 
 
