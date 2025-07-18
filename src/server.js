@@ -42,8 +42,7 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof ClientError) {
- 
-      // penanganan client error secara internal.
+
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
@@ -53,12 +52,10 @@ const init = async () => {
         return newResponse;
       }
 
-      // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
       if (!response.isServer) {
         return h.continue;
       }
 
-      // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
