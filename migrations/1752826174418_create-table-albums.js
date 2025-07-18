@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /**
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
@@ -23,36 +22,7 @@ export const up = (pgm) => {
       type: 'INTEGER',
       notNull: true,
     },
-  });
-
-  pgm.createTable('songs', {
-    song_id: {
-      type: 'VARCHAR(50)',
-      primaryKey: true,
-    },
-    title: {
-      type: 'VARCHAR(50)',
-      notNull: true,
-    },
-    year: {
-      type: 'INTEGER',
-      notNull: true,
-    },
-    performer: {
-      type: 'VARCHAR(50)',
-      notNull: true,
-    },
-    genre: {
-      type: 'VARCHAR(50)',
-      notNull: true,
-    },
-    duration: {
-      type: 'INTEGER',
-    },
-    album_id: {
-      type: 'VARCHAR(50)',
-    },
-  });
+  })
 };
 
 /**
@@ -61,6 +31,5 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
-  pgm.dropTable('albums');
-  pgm.dropTable('songs');
+    pgm.dropTable('albums');
 };

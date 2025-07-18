@@ -23,7 +23,7 @@ const mapDBAlbumToModel = ({
 }) => ({
   id : album_id,
   name,
-  year
+  year,
 });
 
 
