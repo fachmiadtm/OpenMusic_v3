@@ -42,29 +42,24 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof ClientError) {
-
-      if (response instanceof ClientError) {
-        const newResponse = h.response({
-          status: 'fail',
-          message: response.message,
-        });
-        newResponse.code(response.statusCode);
-        return newResponse;
-      }
-
-      if (!response.isServer) {
-        return h.continue;
-      }
-
       const newResponse = h.response({
-        status: 'error',
-        message: 'terjadi kegagalan pada server kami',
+        status: 'fail',
+        message: response.message,
       });
-      newResponse.code(500);
+      newResponse.code(response.statusCode);
       return newResponse;
     }
 
-    return h.continue;
+    if (!response.isServer) {
+      return h.continue;
+    }
+
+    const newResponse = h.response({
+      status: 'error',
+      message: 'terjadi kegagalan pada server kami',
+    });
+    newResponse.code(500);
+    return newResponse;
   });
 
   await server.start();
