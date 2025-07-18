@@ -1,14 +1,12 @@
 /**
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
-// export const shorthands = undefined;
+// const shorthands = undefined;
 
 /**
- * @param pgm {import('node-pg-migrate').MigrationBuilder}
- * @param run {() => void | undefined}
- * @returns {Promise<void> | void}
+ * @param {import('node-pg-migrate').MigrationBuilder} pgm
  */
-export const up = (pgm) => {
+exports.up = (pgm) => {
   pgm.createTable('albums', {
     album_id: {
       type: 'VARCHAR(50)',
@@ -22,14 +20,12 @@ export const up = (pgm) => {
       type: 'INTEGER',
       notNull: true,
     },
-  })
+  });
 };
 
 /**
- * @param pgm {import('node-pg-migrate').MigrationBuilder}
- * @param run {() => void | undefined}
- * @returns {Promise<void> | void}
+ * @param {import('node-pg-migrate').MigrationBuilder} pgm
  */
-export const down = (pgm) => {
-    pgm.dropTable('albums');
+exports.down = (pgm) => {
+  pgm.dropTable('albums');
 };
