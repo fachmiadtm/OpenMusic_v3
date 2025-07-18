@@ -32,6 +32,7 @@ class SongsService {
         text: 'SELECT song_id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
         values: [`%${title}%`, `%${performer}%`],
       };
+
       const result = await this._pool.query(query);
       return result.rows.map(mapDBSongToModel);
     }
@@ -41,6 +42,7 @@ class SongsService {
         text: 'SELECT song_id, title, performer FROM songs WHERE title ILIKE $1',
         values: [`%${title}%`],
       };
+
       const result = await this._pool.query(query);
       return result.rows.map(mapDBSongToModel);
     }
@@ -50,6 +52,7 @@ class SongsService {
         text: 'SELECT song_id, title, performer FROM songs WHERE performer ILIKE $1',
         values: [`%${performer}%`],
       };
+      
       const result = await this._pool.query(query);
       return result.rows.map(mapDBSongToModel);
     }
