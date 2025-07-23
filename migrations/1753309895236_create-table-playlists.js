@@ -1,7 +1,7 @@
 /**
  * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
  */
-// export const shorthands = undefined;
+exports.shorthands = undefined;
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
@@ -9,34 +9,23 @@
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('songs', {
-    song_id: {
+  pgm.createTable('playlists', {
+    id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
-    title: {
+    name: {
       type: 'VARCHAR(50)',
       notNull: true,
     },
-    year: {
-      type: 'INTEGER',
-      notNull: true,
-    },
-    performer: {
+    owner: {
       type: 'VARCHAR(50)',
       notNull: true,
-    },
-    genre: {
-      type: 'VARCHAR(50)',
-      notNull: true,
-    },
-    duration: {
-      type: 'INTEGER',
-    },
-    album_id: {
-      type: 'VARCHAR(50)',
     },
   });
+
+  // memberikan constraint foreign key pada kolom owner terhadap users.id
+  pgm.addConstraint('playlists', 'fk_collaborations.owner_users.id', 'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE');
 };
 
 /**
@@ -45,5 +34,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('songs');
+  pgm.dropTable('playlists');
 };

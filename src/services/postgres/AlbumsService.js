@@ -5,11 +5,11 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const { mapDBAlbumToModel } = require('../../utils');
 const { mapDBSongToModel } = require('../../utils');
 
-
 class AlbumsService {
   constructor() {
     this._pool = new Pool();
   }
+
   async addAlbum({ name, year }) {
     const id = `album-${nanoid(16)}`;
     const query = {
@@ -44,7 +44,7 @@ class AlbumsService {
     };
 
     const songsResult = await this._pool.query(songsQuery);
-    
+
     const album = mapDBAlbumToModel({
       ...albumResult.rows[0],
       songs: songsResult.rows.map(mapDBSongToModel),
