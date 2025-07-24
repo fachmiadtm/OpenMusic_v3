@@ -10,7 +10,7 @@
  */
 exports.up = (pgm) => {
   pgm.createTable('songs', {
-    song_id: {
+    id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
@@ -37,6 +37,9 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
     },
   });
+
+  // memberikan constraint foreign key pada kolom album_id terhadap albums.id
+  pgm.addConstraint('songs', 'fk_songs.album_id_albums.id', 'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE');
 };
 
 /**
