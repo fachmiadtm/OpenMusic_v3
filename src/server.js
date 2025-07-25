@@ -21,15 +21,20 @@ const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
 const playlist = require('./api/playlist');
-const PlaylistsService = require('./services/postgres/PlaylistsSerevice');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
+
+const PlaylistSongsValidator = require('./validator/playlistSongs');
+const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
+const playlistSongs = require('./api/playlistSongs');
 
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
-  const playlistsSerevice = new PlaylistsService();
+  const playlistsService = new PlaylistsService();
+  const playlistSongsService = new PlaylistSongsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -97,8 +102,15 @@ const init = async () => {
     {
       plugin: playlist,
       options: {
-        service: playlistsSerevice,
+        service: playlistsService,
         validator: PlaylistsValidator,
+      },
+    },
+    {
+      plugin: playlistSongs,
+      options: {
+        service: playlistSongsService,
+        validator: PlaylistSongsValidator,
       },
     },
   ]);
@@ -107,6 +119,7 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof Error) {
+      // console.error('Error terjadi:', response); // log ini untuk debug
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
