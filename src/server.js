@@ -31,12 +31,17 @@ const playlistSongs = require('./api/playlistSongs');
 const playlistActivities = require('./api/playlistActivities');
 const PlaylistActivitiesService = require('./services/postgres/PlaylistActivitiesService');
 
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+const collaborations = require('./api/collaborations');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const init = async () => {
+  const collaborationsService = new CollaborationsService();
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
-  const playlistsService = new PlaylistsService();
+  const playlistsService = new PlaylistsService(collaborationsService);
   const playlistSongsService = new PlaylistSongsService();
   const playlistActivitiesService = new PlaylistActivitiesService();
 
@@ -116,6 +121,7 @@ const init = async () => {
         service: playlistSongsService,
         validator: PlaylistSongsValidator,
         playlistActivitiesService,
+        playlistsService,
       },
     },
     {
@@ -125,13 +131,20 @@ const init = async () => {
         playlistsService,
       },
     },
+    {
+      plugin: collaborations,
+      options: {
+        service: collaborationsService,
+        playlistsService,
+        validator: CollaborationsValidator,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
 
     if (response instanceof Error) {
-      // console.error('Error terjadi:', response); // log ini untuk debug
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',

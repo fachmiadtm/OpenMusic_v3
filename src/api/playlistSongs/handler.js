@@ -1,10 +1,11 @@
 const autoBind = require('auto-bind');
 
 class PlaylistSongsHandler {
-  constructor(service, validator, playlistActivitiesService) {
+  constructor(service, validator, playlistActivitiesService, playlistsService) {
     this._service = service;
     this._validator = validator;
     this._playlistActivitiesService = playlistActivitiesService;
+    this._playlistsService = playlistsService;
 
     autoBind(this);
   }
@@ -14,9 +15,9 @@ class PlaylistSongsHandler {
     const { songId } = request.payload;
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
 
-    const playlistSongId = await this._service.addSongtoPlaylist(playlistId, songId);
+    const playlistSongId = await this._service.addSongToPlaylist(playlistId, songId);
     await this._playlistActivitiesService.addActivity({
       playlistId,
       songId,
@@ -38,7 +39,7 @@ class PlaylistSongsHandler {
   async getPlaylistSongsHandler(request) {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
 
     const playlistSongs = await this._service.getPlaylistSongs(playlistId);
     return {
@@ -55,7 +56,7 @@ class PlaylistSongsHandler {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._service.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.deletePlaylistSongById(playlistId, songId);
     await this._playlistActivitiesService.addActivity({
       playlistId,
