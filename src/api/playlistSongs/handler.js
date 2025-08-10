@@ -2,11 +2,11 @@ const autoBind = require('auto-bind');
 const { mapDBPlaylistWithSongs } = require('../../utils');
 
 class PlaylistSongsHandler {
-  constructor(service, validator, playlistActivitiesService, playlistsService) {
+  constructor(service, validator, playlistActivitiesService, checkerService) {
     this._service = service;
     this._validator = validator;
     this._playlistActivitiesService = playlistActivitiesService;
-    this._playlistsService = playlistsService;
+    this._checkerService = checkerService;
 
     autoBind(this);
   }
@@ -16,7 +16,9 @@ class PlaylistSongsHandler {
     const { songId } = request.payload;
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+
+    await this._checkerService.verifyPlaylistAccess(playlistId, credentialId);
+    await this._checkerService.songChecker(songId);
 
     const playlistSongId = await this._service.addSongToPlaylist(playlistId, songId);
     await this._playlistActivitiesService.addActivity({
@@ -40,7 +42,7 @@ class PlaylistSongsHandler {
   async getPlaylistSongsHandler(request, h) {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+    await this._checkerService.verifyPlaylistAccess(playlistId, credentialId);
 
     const getPlaylistWithSongs = await this._service.getPlaylistSongs(playlistId);
     const mappedPlaylistWithSongs = mapDBPlaylistWithSongs(getPlaylistWithSongs);
@@ -61,7 +63,7 @@ class PlaylistSongsHandler {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+    await this._checkerService.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.deletePlaylistSongById(playlistId, songId);
     await this._playlistActivitiesService.addActivity({
       playlistId,

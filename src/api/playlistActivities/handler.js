@@ -1,9 +1,9 @@
 const autoBind = require('auto-bind');
 
 class PlaylistActivitiesHandler {
-  constructor(service, playlistsService) {
+  constructor(service, checkerService) {
     this._service = service;
-    this._playlistsService = playlistsService;
+    this._checkerService = checkerService;
 
     autoBind(this);
   }
@@ -11,7 +11,7 @@ class PlaylistActivitiesHandler {
   async getPlaylistActivitiesHandler(request, h) {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+    await this._checkerService.verifyPlaylistAccess(playlistId, credentialId);
     const activities = await this._service.getActivities(playlistId);
 
     const response = h.response({

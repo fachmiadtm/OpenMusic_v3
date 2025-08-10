@@ -1,9 +1,10 @@
 const autoBind = require('auto-bind');
 
 class PlaylistsHandler {
-  constructor(service, validator) {
+  constructor(service, checkerService, validator) {
     this._service = service;
     this._validator = validator;
+    this._checkerService = checkerService;
 
     autoBind(this);
   }
@@ -44,7 +45,7 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._service.verifyPlaylistOwner(id, credentialId);
+    await this._checkerService.verifyPlaylistOwner(id, credentialId);
     await this._service.deletePlaylistById(id);
 
     const response = h.response({
