@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+const { mapDBPlaylistWithSongs } = require('../../utils');
 
 class PlaylistSongsHandler {
   constructor(service, validator, playlistActivitiesService, playlistsService) {
@@ -36,21 +37,25 @@ class PlaylistSongsHandler {
     return response;
   }
 
-  async getPlaylistSongsHandler(request) {
+  async getPlaylistSongsHandler(request, h) {
     const { playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
 
-    const playlistSongs = await this._service.getPlaylistSongs(playlistId);
-    return {
+    const getPlaylistWithSongs = await this._service.getPlaylistSongs(playlistId);
+    const mappedPlaylistWithSongs = mapDBPlaylistWithSongs(getPlaylistWithSongs);
+
+    const response = h.response({
       status: 'success',
       data: {
-        playlist: playlistSongs,
+        playlist: mappedPlaylistWithSongs,
       },
-    };
+    });
+    response.code(200);
+    return response;
   }
 
-  async deletePlaylistSongByIdHandler(request) {
+  async deletePlaylistSongByIdHandler(request, h) {
     this._validator.validatePlaylistSongsPayload(request.payload);
     const { songId } = request.payload;
     const { playlistId } = request.params;
@@ -65,10 +70,12 @@ class PlaylistSongsHandler {
       action: 'delete',
     });
 
-    return {
+    const response = h.response({
       status: 'success',
       message: 'Lagu berhasil dihapus dari playlist',
-    };
+    });
+    response.code(200);
+    return response;
   }
 }
 

@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+const { mapDBAlbumWithSongs } = require('../../utils');
 
 class AlbumsHandler {
   constructor(service, validator) {
@@ -25,36 +26,46 @@ class AlbumsHandler {
     return response;
   }
 
-  async getAlbumByIdHandler(request) {
+  async getAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    const album = await this._service.getAlbumById(id);
-    return {
+    const getAlbumResult = await this._service.getAlbumById(id);
+
+    const mappedAlbum = mapDBAlbumWithSongs(getAlbumResult);
+
+    const response = h.response({
       status: 'success',
       data: {
-        album,
+        album: mappedAlbum,
       },
-    };
+    });
+    response.code(200);
+    return response;
   }
 
-  async putAlbumByIdHandler(request) {
+  async putAlbumByIdHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
     const { id } = request.params;
 
     await this._service.editAlbumById(id, request.payload);
-    return {
+
+    const response = h.response({
       status: 'success',
       message: 'Album berhasil diperbarui',
-    };
+    });
+    response.code(200);
+    return response;
   }
 
-  async deleteAlbumByIdHandler(request) {
+  async deleteAlbumByIdHandler(request, h) {
     const { id } = request.params;
     await this._service.deleteAlbumById(id);
 
-    return {
+    const response = h.response({
       status: 'success',
       message: 'Album berhasil dihapus',
-    };
+    });
+    response.code(200);
+    return response;
   }
 }
 
