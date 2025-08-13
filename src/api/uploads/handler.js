@@ -8,16 +8,15 @@ class UploadsHandler {
 
   async postAlbumCoverHandler(request, h) {
     const { id } = request.params;
-    const { data } = request.payload;
-    this._validator.validateImageHeaders(data.hapi.headers);
+    const { cover } = request.payload;
+    this._validator.validateImageHeaders(cover.hapi.headers);
 
-    const filename = await this._service.writeFile(data, data.hapi);
+    const filename = await this._service.writeFile(cover, cover.hapi);
 
+    await this._service.addAlbumCoverURL(filename, id);
     const response = h.response({
       status: 'success',
-      data: {
-        fileLocation: `http://${process.env.HOST}:${process.env.PORT}/albums/${id}/covers${filename}`,
-      },
+      message: 'Sampul berhasil diunggah',
     });
     response.code(201);
     return response;

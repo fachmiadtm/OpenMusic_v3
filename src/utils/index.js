@@ -17,7 +17,9 @@ const mapDBSongToModel = ({
 });
 
 const mapDBAlbumWithSongs = (rows) => {
-  const { album_id, name, year } = rows[0];
+  const {
+    album_id, name, year, album_cover,
+  } = rows[0];
   const songs = rows[0].song_id
     ? rows.map((row) => ({
       id: row.song_id,
@@ -30,6 +32,7 @@ const mapDBAlbumWithSongs = (rows) => {
     id: album_id,
     name,
     year,
+    coverUrl: album_cover || null,
     songs,
   };
 };

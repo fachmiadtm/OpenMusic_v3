@@ -1,7 +1,9 @@
 const fs = require('fs');
+const { Pool } = require('pg');
 
 class StorageService {
   constructor(folder) {
+    this._pool = new Pool();
     this._folder = folder;
 
     if (!fs.existsSync(folder)) {
@@ -20,6 +22,15 @@ class StorageService {
       file.pipe(fileStream);
       file.on('end', () => resolve(filename));
     });
+  }
+
+  async addAlbumCoverURL(filename, id) {
+    const albumCoverURL = `http://${process.env.HOST}:${process.env.PORT}/albums/${id}/covers/${filename}`;
+    const query = {
+      text: 'UPDATE albums SET album_cover = $1 WHERE id = $2',
+      values: [albumCoverURL, id],
+    };
+    await this._pool.query(query);
   }
 }
 
