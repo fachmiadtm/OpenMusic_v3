@@ -8,6 +8,28 @@ class CheckerService {
     this._pool = new Pool();
   }
 
+  async albumChecker(albumId) {
+    const albumQuery = {
+      text: 'SELECT * FROM albums WHERE id = $1',
+      values: [albumId],
+    };
+    const albumResult = await this._pool.query(albumQuery);
+    if (!albumResult.rows.length) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+  }
+
+  async songChecker(songId) {
+    const albumQuery = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [songId],
+    };
+    const songResult = await this._pool.query(albumQuery);
+    if (!songResult.rows.length) {
+      throw new NotFoundError('Lagu tidak ditemukan');
+    }
+  }
+
   async playlistChecker(playlistId) {
     const playlistQuery = {
       text: 'SELECT * FROM playlists WHERE playlists.id = $1',
@@ -28,17 +50,6 @@ class CheckerService {
     const userResult = await this._pool.query(userQuery);
     if (!userResult.rows.length) {
       throw new NotFoundError('User tidak ditemukan');
-    }
-  }
-
-  async songChecker(songId) {
-    const songQuery = {
-      text: 'SELECT * FROM songs WHERE id = $1',
-      values: [songId],
-    };
-    const songResult = await this._pool.query(songQuery);
-    if (!songResult.rows.length) {
-      throw new NotFoundError('Lagu tidak ditemukan');
     }
   }
 
@@ -84,6 +95,18 @@ class CheckerService {
       } catch {
         throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
       }
+    }
+  }
+
+  async likeChecker(id, credentialId) {
+    const query = {
+      text: 'SELECT * FROM user_album_likes WHERE album_id = $1 AND user_id = $2',
+      values: [id, credentialId],
+    };
+    const result = await this._pool.query(query);
+
+    if (result.rows.length > 0) {
+      throw new InvariantError('Anda sudah menyukai album ini.');
     }
   }
 }
