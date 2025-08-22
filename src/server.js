@@ -53,6 +53,7 @@ const AlbumLikesService = require('./services/postgres/AlbumLikesService');
 const albumLikes = require('./api/albumLikes');
 
 const CacheService = require('./services/redis/CacheService');
+const config = require('./utils/config');
 
 const init = async () => {
   const collaborationsService = new CollaborationsService();
@@ -69,8 +70,8 @@ const init = async () => {
   const albumLikesService = new AlbumLikesService(cacheService);
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    host: config.app.host,
+    port: config.app.port,
     routes: {
       cors: {
         origin: ['*'],
@@ -88,12 +89,12 @@ const init = async () => {
   ]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.token.accessKey,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: config.token.accessAge,
     },
     validate: (artifacts) => ({
       isValid: true,

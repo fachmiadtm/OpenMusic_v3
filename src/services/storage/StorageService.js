@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { Pool } = require('pg');
+const config = require('../../utils/config');
 
 class StorageService {
   constructor(folder) {
@@ -25,7 +26,7 @@ class StorageService {
   }
 
   async addAlbumCoverURL(filename, id) {
-    const albumCoverURL = `http://${process.env.HOST}:${process.env.PORT}/albums/${id}/covers/${filename}`;
+    const albumCoverURL = `http://${config.app.host}:${config.app.host}/albums/${id}/covers/${filename}`;
     const query = {
       text: 'UPDATE albums SET album_cover = $1 WHERE id = $2',
       values: [albumCoverURL, id],
