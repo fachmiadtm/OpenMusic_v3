@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { mapDBPlaylistWithSongs } = require('../../utils');
 
 class PlaylistSongsService {
   constructor() {
@@ -41,7 +42,7 @@ class PlaylistSongsService {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    return result.rows;
+    return mapDBPlaylistWithSongs(result.rows);
   }
 
   async deletePlaylistSongById(playlistId, songId) {

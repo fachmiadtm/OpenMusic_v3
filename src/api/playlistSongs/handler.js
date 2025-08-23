@@ -1,5 +1,4 @@
 const autoBind = require('auto-bind');
-const { mapDBPlaylistWithSongs } = require('../../utils');
 
 class PlaylistSongsHandler {
   constructor(service, validator, playlistActivitiesService, checkerService) {
@@ -44,13 +43,12 @@ class PlaylistSongsHandler {
     const { id: credentialId } = request.auth.credentials;
     await this._checkerService.verifyPlaylistAccess(playlistId, credentialId);
 
-    const getPlaylistWithSongs = await this._service.getPlaylistSongs(playlistId);
-    const mappedPlaylistWithSongs = mapDBPlaylistWithSongs(getPlaylistWithSongs);
+    const playlistWithSongs = await this._service.getPlaylistSongs(playlistId);
 
     const response = h.response({
       status: 'success',
       data: {
-        playlist: mappedPlaylistWithSongs,
+        playlist: playlistWithSongs,
       },
     });
     response.code(200);

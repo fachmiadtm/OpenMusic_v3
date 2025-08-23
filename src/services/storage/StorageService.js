@@ -26,7 +26,7 @@ class StorageService {
   }
 
   async addAlbumCoverURL(filename, id) {
-    const albumCoverURL = `http://${config.app.host}:${config.app.host}/albums/${id}/covers/${filename}`;
+    const albumCoverURL = `http://${config.app.host}:${config.app.port}/albums/${id}/covers/${filename}`;
     const query = {
       text: 'UPDATE albums SET album_cover = $1 WHERE id = $2',
       values: [albumCoverURL, id],

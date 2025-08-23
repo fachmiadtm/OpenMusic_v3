@@ -1,5 +1,4 @@
 const autoBind = require('auto-bind');
-const { mapDBAlbumWithSongs } = require('../../utils');
 
 class AlbumsHandler {
   constructor(service, validator) {
@@ -28,14 +27,12 @@ class AlbumsHandler {
 
   async getAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    const getAlbumResult = await this._service.getAlbumById(id);
-
-    const mappedAlbum = mapDBAlbumWithSongs(getAlbumResult);
+    const albumResult = await this._service.getAlbumById(id);
 
     const response = h.response({
       status: 'success',
       data: {
-        album: mappedAlbum,
+        album: albumResult,
       },
     });
     response.code(200);

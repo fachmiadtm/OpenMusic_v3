@@ -2,7 +2,9 @@ const Joi = require('joi');
 
 const AlbumPayloadSchema = Joi.object({
   name: Joi.string().required(),
-  year: Joi.number().required(),
+  year: Joi.number().integer()
+    .min(1940).max(2025)
+    .required(),
 });
 
 module.exports = { AlbumPayloadSchema };
