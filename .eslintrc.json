@@ -13,6 +13,12 @@
         "no-console": "off",
         "linebreak-style": "off",
         "no-underscore-dangle": "off",
-        "camelcase": "off"
+        "camelcase": "off",
+        "max-len": ["error", { "code": 121 }],
+        "import/no-extraneous-dependencies": ["error", {
+            "devDependencies": true,
+            "optionalDependencies": false,
+            "peerDependencies": false
+            }]
     }
 }

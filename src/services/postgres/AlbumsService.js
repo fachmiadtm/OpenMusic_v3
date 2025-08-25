@@ -5,8 +5,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const { mapDBAlbumWithSongs } = require('../../utils');
 
 class AlbumsService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addAlbum({ name, year }) {
@@ -22,26 +23,34 @@ class AlbumsService {
       throw new InvariantError('Album gagal ditambahkan');
     }
 
+    await this._cacheService.delete('album');
     return result.rows[0].id;
   }
 
   async getAlbumById(id) {
-    const query = {
-      text: `SELECT albums.id AS album_id, albums.name, albums.year, albums.album_cover,
+    try {
+      const result = await this._cacheService.get(`album:${id}`);
+      return JSON.parse(result);
+    } catch (error) {
+      const query = {
+        text: `SELECT albums.id AS album_id, albums.name, albums.year, albums.album_cover,
       songs.id AS song_id, songs.title, songs.performer 
       FROM albums
       LEFT JOIN songs ON albums.id = songs.album_id
       WHERE albums.id = $1`,
-      values: [id],
-    };
+        values: [id],
+      };
 
-    const result = await this._pool.query(query);
+      const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
+      if (!result.rows.length) {
+        throw new NotFoundError('Album tidak ditemukan');
+      }
+
+      const album = mapDBAlbumWithSongs(result.rows);
+      await this._cacheService.set(`album-likes:${id}`, JSON.stringify(album));
+      return album;
     }
-
-    return mapDBAlbumWithSongs(result.rows);
   }
 
   async editAlbumById(id, { name, year }) {
@@ -55,6 +64,7 @@ class AlbumsService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
+    await this._cacheService.delete(`album:${id}`);
   }
 
   async deleteAlbumById(id) {
@@ -68,6 +78,7 @@ class AlbumsService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal menghapus album. Id tidak ditemukan');
     }
+    await this._cacheService.delete(`album:${id}`);
   }
 }
 

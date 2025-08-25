@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
@@ -56,17 +55,17 @@ const CacheService = require('./services/redis/CacheService');
 const config = require('./utils/config');
 
 const init = async () => {
-  const collaborationsService = new CollaborationsService();
+  const cacheService = new CacheService();
+  const collaborationsService = new CollaborationsService(cacheService);
   const checkerService = new CheckerService(collaborationsService);
-  const albumsService = new AlbumsService();
-  const songsService = new SongsService();
+  const albumsService = new AlbumsService(cacheService);
+  const songsService = new SongsService(cacheService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
-  const playlistsService = new PlaylistsService();
-  const playlistSongsService = new PlaylistSongsService();
-  const playlistActivitiesService = new PlaylistActivitiesService();
+  const playlistsService = new PlaylistsService(cacheService);
+  const playlistSongsService = new PlaylistSongsService(cacheService);
+  const playlistActivitiesService = new PlaylistActivitiesService(cacheService);
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
-  const cacheService = new CacheService();
   const albumLikesService = new AlbumLikesService(cacheService);
 
   const server = Hapi.server({

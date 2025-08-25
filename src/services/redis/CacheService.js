@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const redis = require('redis');
 const config = require('../../utils/config');
 

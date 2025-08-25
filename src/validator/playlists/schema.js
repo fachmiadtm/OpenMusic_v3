@@ -1,4 +1,3 @@
-/* eslint-disable eol-last */
 const Joi = require('joi');
 
 const PlaylistPayloadSchema = Joi.object({

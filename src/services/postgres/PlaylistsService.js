@@ -2,11 +2,11 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-// const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addPlaylist({ name, owner }) {
@@ -21,24 +21,32 @@ class PlaylistsService {
       throw new InvariantError('Playlist gagal ditambahkan');
     }
 
+    await this._cacheService.delete(`playlists:${owner}`);
     return result.rows[0].id;
   }
 
-  async getPlaylists({ owner }) {
-    const query = {
-      text: `SELECT DISTINCT playlists.id, playlists.name, users.username
+  async getPlaylists(owner) {
+    try {
+      const result = await this._cacheService.get(`playlists:${owner}`);
+      return JSON.parse(result);
+    } catch (error) {
+      const query = {
+        text: `SELECT DISTINCT playlists.id, playlists.name, users.username
       FROM playlists
       JOIN users ON playlists.owner = users.id
       LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id
       WHERE playlists.owner = $1 OR collaborations.user_id = $1
       ORDER BY playlists.name`,
-      values: [owner],
-    };
-    const result = await this._pool.query(query);
-    return result.rows;
+        values: [owner],
+      };
+      const result = await this._pool.query(query);
+      const playlist = result.rows;
+      await this._cacheService.set(`playlists:${owner}`, JSON.stringify(playlist));
+      return playlist;
+    }
   }
 
-  async deletePlaylistById(id) {
+  async deletePlaylistById(id, owner) {
     const query = {
       text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
       values: [id],
@@ -47,6 +55,7 @@ class PlaylistsService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal menghapus playlist. Id tidak ditemukan');
     }
+    await this._cacheService.delete(`playlists:${owner}`);
   }
 }
 
